@@ -71,7 +71,7 @@ test('Should create a new user', async () => {
 })
 
 test('Should expose public users profiles', async () => {
-    const gerUsers = gql`
+    const getUsers = gql`
         query {
             users {
                 id
@@ -122,5 +122,30 @@ test('Should not login with bad credentials', async () => {
             }
         }
     `
-    expect(client.mutate({ mutation: login })).rejects.toThrow()
+    await expect(client.mutate({ 
+        mutation: login 
+    })).rejects.toThrow()
+})
+
+test('Should not create a user with a bad password', async () => {
+    const createUser = gql`
+        mutation
+        {
+            createUser(
+                data: {
+                    name: "Joan2",
+                    email: "joan2@example.com",
+                    password: "short"
+                }
+            ){
+                token
+                user {
+                    id
+                }
+            }           
+        }
+    `
+    await expect(client.mutate({
+        mutation: createUser
+    })).rejects.toThrow()
 })
